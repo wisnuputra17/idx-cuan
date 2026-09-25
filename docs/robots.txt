@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://wisnuputra17.github.io/idx-cuan/sitemap.xml
