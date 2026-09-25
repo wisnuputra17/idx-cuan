@@ -26,6 +26,7 @@ SITE_URL = "https://wisnuputra17.github.io/idx-cuan"  # GitHub Pages project URL
 # --- Placeholder monetisasi (isi setelah daftar) ---
 AJAIB_REF = "PLACEHOLDER_AJAIB"          # kode referral Ajaib
 ADSENSE_CLIENT = "ca-pub-PLACEHOLDER"    # AdSense publisher id
+GSC_VERIFY = ""                          # token Google Search Console (isi dari GSC → HTML tag method)
 
 WATCHLIST = ["BBCA.JK","BBRI.JK","BMRI.JK","BBNI.JK","TLKM.JK","ASII.JK",
              "GOTO.JK","BUMI.JK","ANTM.JK","MDKA.JK","ADRO.JK","PGAS.JK",
@@ -106,10 +107,11 @@ def score_cls(s):
     return "sc-p" if s>0 else "sc-n" if s<0 else "sc-0"
 
 def head(title, desc, canonical):
+    gsc = f'\n<meta name="google-site-verification" content="{GSC_VERIFY}">' if GSC_VERIFY else ''
     return f"""<!DOCTYPE html><html lang="id"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title>
-<meta name="description" content="{desc}">
+<meta name="description" content="{desc}">{gsc}
 <link rel="canonical" href="{canonical}">
 <meta property="og:title" content="{title}"><meta property="og:description" content="{desc}">
 <meta property="og:type" content="website"><meta name="robots" content="index,follow">
