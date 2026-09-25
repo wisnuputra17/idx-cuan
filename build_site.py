@@ -26,7 +26,7 @@ SITE_URL = "https://wisnuputra17.github.io/idx-cuan"  # GitHub Pages project URL
 # --- Placeholder monetisasi (isi setelah daftar) ---
 AJAIB_REF = "PLACEHOLDER_AJAIB"          # kode referral Ajaib
 ADSENSE_CLIENT = "ca-pub-PLACEHOLDER"    # AdSense publisher id
-GSC_VERIFY = ""                          # token Google Search Console (isi dari GSC → HTML tag method)
+GSC_VERIFY = "qX8QbC6aHiIWixybPmi6ww2zW680CIaWAuDP0l3FWJs"  # token Google Search Console
 
 WATCHLIST = ["BBCA.JK","BBRI.JK","BMRI.JK","BBNI.JK","TLKM.JK","ASII.JK",
              "GOTO.JK","BUMI.JK","ANTM.JK","MDKA.JK","ADRO.JK","PGAS.JK",
