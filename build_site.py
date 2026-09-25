@@ -13,7 +13,9 @@ Jalankan: ~/.hermes/venv/bin/python3 build_site.py
 import sys, os, json, datetime
 
 sys.path.insert(0, '/Users/wisnuputra/trading-tools')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import signal_engine as se
+from articles import ARTICLES
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 PUBLIC = os.path.join(BASE, 'docs')
@@ -27,17 +29,26 @@ ADSENSE_CLIENT = "ca-pub-PLACEHOLDER"    # AdSense publisher id
 
 WATCHLIST = ["BBCA.JK","BBRI.JK","BMRI.JK","BBNI.JK","TLKM.JK","ASII.JK",
              "GOTO.JK","BUMI.JK","ANTM.JK","MDKA.JK","ADRO.JK","PGAS.JK",
-             "UNVR.JK","ICBP.JK","CUAN.JK"]
+             "UNVR.JK","ICBP.JK","CUAN.JK"]  # (di-override oleh NAMES.keys() di bawah)
 
 NAMES = {
-    "BBCA.JK":"Bank Central Asia","BBRI.JK":"Bank Rakyat Indonesia",
-    "BMRI.JK":"Bank Mandiri","BBNI.JK":"Bank Negara Indonesia",
-    "TLKM.JK":"Telkom Indonesia","ASII.JK":"Astra International",
-    "GOTO.JK":"GoTo Gojek Tokopedia","BUMI.JK":"Bumi Resources",
-    "ANTM.JK":"Aneka Tambang","MDKA.JK":"Merdeka Copper Gold",
-    "ADRO.JK":"Adaro Energy","PGAS.JK":"Perusahaan Gas Negara",
-    "UNVR.JK":"Unilever Indonesia","ICBP.JK":"Indofood CBP","CUAN.JK":"Petrindo Jaya Kreasi",
+ "BBCA.JK":"Bank Central Asia","BBRI.JK":"Bank Rakyat Indonesia","BMRI.JK":"Bank Mandiri",
+ "BBNI.JK":"Bank Negara Indonesia","BRIS.JK":"Bank Syariah Indonesia","ARTO.JK":"Bank Jago",
+ "TLKM.JK":"Telkom Indonesia","ASII.JK":"Astra International","GOTO.JK":"GoTo Gojek Tokopedia",
+ "BUMI.JK":"Bumi Resources","ANTM.JK":"Aneka Tambang","MDKA.JK":"Merdeka Copper Gold",
+ "ADRO.JK":"Adaro Energy","PGAS.JK":"Perusahaan Gas Negara","UNVR.JK":"Unilever Indonesia",
+ "ICBP.JK":"Indofood CBP","INDF.JK":"Indofood Sukses Makmur","CUAN.JK":"Petrindo Jaya Kreasi",
+ "PTBA.JK":"Bukit Asam","ITMG.JK":"Indo Tambangraya","INCO.JK":"Vale Indonesia",
+ "TINS.JK":"Timah","AMMN.JK":"Amman Mineral","MBMA.JK":"Merdeka Battery",
+ "KLBF.JK":"Kalbe Farma","GGRM.JK":"Gudang Garam","HMSP.JK":"HM Sampoerna",
+ "AKRA.JK":"AKR Corporindo","SMGR.JK":"Semen Indonesia","INTP.JK":"Indocement",
+ "CPIN.JK":"Charoen Pokphand","JPFA.JK":"Japfa Comfeed","MAPI.JK":"Mitra Adiperkasa",
+ "ACES.JK":"Aspirasi Hidup Indonesia","MNCN.JK":"Media Nusantara Citra","EMTK.JK":"Elang Mahkota",
+ "BUKA.JK":"Bukalapak","EXCL.JK":"XL Axiata","ISAT.JK":"Indosat","TOWR.JK":"Sarana Menara",
+ "BRPT.JK":"Barito Pacific","TPIA.JK":"Chandra Asri","ESSA.JK":"ESSA Industries",
+ "PGEO.JK":"Pertamina Geothermal","RAJA.JK":"Rukun Raharja",
 }
+WATCHLIST = list(NAMES.keys())
 
 CSS = """
 :root{--bg:#0b0e14;--card:#151a23;--border:#232a36;--fg:#e6e9ef;--muted:#8b95a7;
@@ -159,6 +170,13 @@ def build():
     home += ad_box("Iklan (AdSense)")
     home += f"""<table><thead><tr><th>Saham</th><th>Harga</th><th>Skor</th><th>Sinyal</th><th>Update</th></tr></thead><tbody>{rows}</tbody></table>"""
     home += aff_box()
+    # Section Belajar (link ke artikel edukasi)
+    art_links = "".join(
+        f'<a class="gl" href="/belajar/{a["slug"]}.html">📚 {a["title"]}</a>'
+        for a in ARTICLES)
+    home += f"""<div style="margin-top:28px"><h2 style="font-size:1.15rem;margin-bottom:6px">📚 Belajar Analisa Teknikal</h2>
+<p style="color:var(--muted);font-size:.9rem">Panduan singkat memahami indikator yang dipakai IDX Cuan.</p>
+<div class="grid-links">{art_links}</div></div>"""
     home += disclaimer() + footer()
     with open(os.path.join(PUBLIC,'index.html'),'w') as f: f.write(home)
 
@@ -187,8 +205,23 @@ def build():
         page += disclaimer() + footer()
         with open(os.path.join(PUBLIC,f'{sl}.html'),'w') as f: f.write(page)
 
+    # --- Artikel edukasi (SEO evergreen) ---
+    os.makedirs(os.path.join(PUBLIC,'belajar'), exist_ok=True)
+    for a in ARTICLES:
+        ap = head(f"{a['title']} | {SITE_NAME}", a['desc'],
+                  f"{SITE_URL}/belajar/{a['slug']}.html")
+        ap += f'<meta name="keywords" content="{a["kw"]}">'
+        ap += header_html()
+        ap += '<a class="back" href="/">← Kembali ke ranking saham</a>'
+        ap += f'<article class="card"><h1 style="font-size:1.5rem;margin-bottom:16px">{a["title"]}</h1>{a["body"]}</article>'
+        ap += ad_box("Iklan (AdSense)")
+        ap += aff_box()
+        ap += disclaimer() + footer()
+        with open(os.path.join(PUBLIC,'belajar',f'{a["slug"]}.html'),'w') as f: f.write(ap)
+
     # sitemap + robots
     urls = [f"{SITE_URL}/"] + [f"{SITE_URL}/{slug(r['symbol'])}.html" for r in results]
+    urls += [f"{SITE_URL}/belajar/{a['slug']}.html" for a in ARTICLES]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     today = datetime.date.today().isoformat()
     for u in urls: sm += f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>\n"
